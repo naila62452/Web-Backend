@@ -2,7 +2,7 @@ const { User, validate } = require('../models/user');
 const express = require('express');
 const router = express.Router();
 
-router.post('/', async (req, res) => {
+router.post('/register', async (req, res) => {
     // First Validate The Request
     const { error } = validate(req.body);
     if (error) {
