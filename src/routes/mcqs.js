@@ -5,7 +5,8 @@ const Mcqs = require('../models/mcqs');
 
 //Create a new question
 function isValidQuestionRequest(req) {
-    if (!req.body.question || !req.body.options) {
+    if (!req.body.question || !req.body.option1 || req.body.option2 || req.body.option3
+       || req.body.option4 || req.body.answer) {
         return false;
     }
     return true;
@@ -13,17 +14,21 @@ function isValidQuestionRequest(req) {
 function CreateQuestion(req, res) {
 
     // validate request
-    if (!isValidQuestionRequest(req)) {
-        return res.status(400).send({
-            success: false,
-            message: "Please fill out all the required feilds"
-        });
-    }
+    // if (!isValidQuestionRequest(req)) {
+    //     return res.status(400).send({
+    //         success: false,
+    //         message: "Please fill out all the required feilds"
+    //     });
+    // }
     // create a mcqs
     let mcqs = new Mcqs(
         {
-            question: req.body.question,
-            options: req.body.options
+            mcqs: req.body.mcqs,
+            option1: req.body.option1,
+            option2: req.body.option2,
+            option3: req.body.option3,
+            option4: req.body.option4,
+            answer: req.body.answer
         }
     );
 
