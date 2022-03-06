@@ -5,7 +5,8 @@ const Mcqs = require('../models/mcqs');
 
 //Create a new question
 function isValidQuestionRequest(req) {
-    if (!req.body.question || !req.body.options) {
+    if (!req.body.question || !req.body.option1 || req.body.option2 || req.body.option3
+       || req.body.option4 || req.body.answer) {
         return false;
     }
     return true;
@@ -13,28 +14,28 @@ function isValidQuestionRequest(req) {
 function CreateQuestion(req, res) {
 
     // validate request
-    if (!isValidQuestionRequest(req)) {
-        return res.status(400).send({
-            success: false,
-            message: "Please fill out all the required feilds"
-        });
-    }
+    // if (!isValidQuestionRequest(req)) {
+    //     return res.status(400).send({
+    //         success: false,
+    //         message: "Please fill out all the required feilds"
+    //     });
+    // }
     // create a mcqs
     let mcqs = new Mcqs(
         {
-            question: req.body.question,
-            options: req.body.options
+            mcqs: req.body.mcqs,
+            option1: req.body.option1,
+            option2: req.body.option2,
+            option3: req.body.option3,
+            option4: req.body.option4,
+            answer: req.body.answer
         }
     );
 
     // save mcqs in the database.
     mcqs.save()
         .then(data => {
-            res.send(
-                // success: true,
-                // message: 'Mcqs successfully created',
-                data
-            );
+            res.send(data);
         }).catch(err => {
             res.status(500).send({
                 success: false,
@@ -45,18 +46,13 @@ function CreateQuestion(req, res) {
 
 // retrieve and return all mcqs.
 function allMcqs_questions(req, res) {
-    console.log("hi")
     Mcqs.find()
         .then(data => {
             var message = "";
             if (data === undefined || data.length == 0) message = "No Mcqs found!";
             else message = 'Mcqs successfully retrieved';
 
-            res.send({
-                success: true,
-                message: message,
-                data: data
-            });
+            res.send(data);
         }).catch(err => {
             res.status(500).send({
                 success: false,
@@ -72,19 +68,18 @@ function mcqs_delete(req, res) {
             if (!data) {
                 return res.status(404).send({
                     success: false,
-                    message: "Shop not found with id " + req.params.id
+                    message: "Mcqs not found with id " + req.params.id
                 });
             }
             res.send({
                 success: true,
-                message: "Shop successfully deleted!"
+                message: "Mcqs successfully deleted!"
             });
         })
 };
 
 // find a single mcqs with a id.
 function mcqs_details(req, res) {
-    console.log("hello")
     Mcqs.findById(req.params.id)
         .then(data => {
             if (!data) {
@@ -93,18 +88,53 @@ function mcqs_details(req, res) {
                     message: "Mcqs not found with id " + req.params.id
                 });
             }
+            res.send(data);
+        })
+};
+
+// update a Mcqs  by the id.
+function mcqs_update (req, res) {
+    // validate request
+    if(!req.body.question || !req.body.options) {
+        return res.status(400).send({
+            success: false,
+            message: "Please enter All details"
+        });
+    }
+
+    // find Mcqs and update
+    Mcqs.findByIdAndUpdate(req.params.id, {
+        $set: req.body
+    }, {new: true})
+        .then(data => {
+            if(!data) {
+                return res.status(404).send({
+                    success: false,
+                    message: "Mcqs not found with id " + req.params.id
+                });
+            }
             res.send({
                 success: true,
-                message: 'Mcqs successfully retrieved',
                 data: data
             });
-        })
+        }).catch(err => {
+        if(err.kind === 'ObjectId') {
+            return res.status(404).send({
+                success: false,
+                message: "Mcqs not found with id " + req.params.id
+            });
+        }
+        return res.status(500).send({
+            success: false,
+            message: "Error updating Mcqs with id " + req.params.id
+        });
+    });
 };
 
 //Routes
 router.get('/', allMcqs_questions);
 router.post('/create', CreateQuestion);
 router.get('/:id', mcqs_details);
-// router.put('/update/:id', mcqs_update);
+router.put('/update/:id', mcqs_update);
 router.delete('/delete/:id', mcqs_delete);
 module.exports = router;
