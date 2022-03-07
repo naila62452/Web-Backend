@@ -21,6 +21,7 @@ const createStudent = async function (req, res) {
             username: req.body.username,
             password: req.body.password,
         });
+        // Salt the password
         const salt = await bcrypt.genSalt(10);
         student.password = await bcrypt.hash(student.password, salt)
         await student.save();
@@ -38,10 +39,11 @@ const loginStudent = function (req, res) {
         const passwordIsValid = bcrypt.compareSync(req.body.password, student.password)
         if (!passwordIsValid) return res.status(401).send({ auth: false, token: null })
         const token = jwt.sign({ id: student._id }, jwtSecretKey, { expiresIn: 86400 });
-
+        // Create jason web token for authentication
         res.status(200).send({ auth: true, token: token });
     })
 }
+
 //Routes
 router.post('/login', loginStudent);
 router.post('/create', createStudent);
