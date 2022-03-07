@@ -22,6 +22,7 @@ app.use(function (req, res, next) {
     res.header("Access-Control-Allow-Methods", "GET, PUT, POST, DELETE");
     next();
 });
+
 app.use('/api/users', users);
 app.use('/api/mcqs', mcqsRoute);
 app.use('/api/true_false', tfRoute);

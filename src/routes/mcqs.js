@@ -28,6 +28,7 @@ function CreateQuestion(req, res) {
             option2: req.body.option2,
             option3: req.body.option3,
             option4: req.body.option4,
+            
             answer: req.body.answer
         }
     );
