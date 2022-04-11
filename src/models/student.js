@@ -9,6 +9,7 @@ const Student = mongoose.model('Student', new mongoose.Schema({
         maxlength: 50
     },
     password: {
+        //This iis for the pass
         type: String,
         required: true,
         minlength: 5,
