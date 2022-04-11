@@ -1,4 +1,6 @@
 var jwt = require('jsonwebtoken');
+const dotenv = require('dotenv');
+dotenv.config();
 let jwtSecretKey = process.env.JWT_SECRET_KEY;
 
 function verifyToken(req, res, next) {
@@ -11,7 +13,10 @@ function verifyToken(req, res, next) {
             return res.status(500).send({ auth: false, message: 'Failed to authenticate token.' });
 
         // if everything good, save to request for use in other routes
-        req.userId = decoded.id;
+        req.user = {
+
+        }
+        req.user._id = decoded.id;
         next();
     });
 }

@@ -1,5 +1,6 @@
 const Joi = require('joi');
 const mongoose = require('mongoose');
+const config = require('config');
 
 const User = mongoose.model('User', new mongoose.Schema({
     name: {
@@ -17,27 +18,39 @@ const User = mongoose.model('User', new mongoose.Schema({
     },
     password: {
         type: String,
-        required: true,
+        // required: true,
         minlength: 5,
         maxlength: 1024
     },
-    subject: {
-        type: String,
-        required: true,
-        minlength: 5,
-        maxlength: 50
+    isVerified: {
+        type: Boolean,
+        default: false
+    },
+    profilePictureURL: {
+        type: String
     }
+
 }));
 
+// User.methods.generateAuthToken = function () {
+//     const token = jwt.sign(
+//         {
+//             _id: this.id,
+//             name: this.name,
+//             userId: this.userId
+//         },
+//         config.get('jwtPrivateKey')
+//     );
+//     return token;
+// }
 function validateUser(user) {
     const schema = Joi.object({
         name: Joi.string().min(5).max(50).required(),
         email: Joi.string().min(5).max(255).required().email(),
-        password: Joi.string().min(5).max(255).required(),
-        subject: Joi.string().min(5).max(50).required(),
-        // confirmPassword: Joi.any().valid(Joi.ref('password')).required().options({ language: { any: { allowOnly: 'must match password' } } }).optional()
-    }) ;
-    return schema.validate( user);
+        password: Joi.string().min(5).max(255).required()
+    });
+    return schema.validate(user);
 }
+
 exports.User = User;
 exports.validate = validateUser;

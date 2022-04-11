@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const Schema = mongoose.Schema;
 
 const mcqsSchema = new mongoose.Schema({
     mcqs: { 
@@ -21,29 +22,29 @@ const mcqsSchema = new mongoose.Schema({
        type: String, 
        required: true 
    },
+   image: {
+       type: []
+   },
    answer: { 
        type: String, 
        required: true 
+   },
+   userId: {
+    type: Schema.Types.ObjectId,
+    required: true,
+    ref: "user"
+   },
+   topicId:{
+    type: Schema.Types.ObjectId,
+    required: true,
+    ref: "topic"
+   },
+   typeId:{
+    type: Schema.Types.ObjectId,
+    required: true,
+    ref: "type"
    }
 });
-    // question: {
-    //     type: String,
-    //     required: true
-    // },
-    // options: [
-    //     {
-    //         option: {
-    //             type: String,
-    //             required: true
-    //         },
-    //         isCorrect: {
-    //             type: Boolean,
-    //             required: true,
-    //             default: false
-    //         }
-    //     }
-    // ]
-// })
 
 const Mcqs = mongoose.model('MCQS', mcqsSchema);
 module.exports = Mcqs;
