@@ -23,12 +23,14 @@ const upload = multer({ storage: store }).single('file');
 //Create a new question
 function CreateQuestion(req, res) {
     let imagesPaths = [];
+    console.log(req.file)
     if (req.files) {
         imagesPaths = req.files.map(element => {
             return currentTime.getUTCFullYear() + "/" + element.originalname;
         });
     }
     else {
+        
         imagesPaths.push(req.file.originalname)
     }
     let mcqs = new Mcqs(
