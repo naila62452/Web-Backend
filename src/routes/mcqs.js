@@ -3,22 +3,47 @@ const router = express.Router();
 const Mcqs = require('../models/mcqs');
 const multer = require('multer')
 var fs = require('fs');
-const url = require('url');
+const util = require("util");
+const dbConfig = require("../config/db");
+const url = dbConfig.url;
+const GridFSBucket = require("mongodb").GridFSBucket;
+const MongoClient = require("mongodb").MongoClient;
+const mongoClient = new MongoClient(url);
+const { GridFsStorage } = require("multer-gridfs-storage");
 
-const currentTime = new Date()
-const store = multer.diskStorage({
-    destination: function (req, file, cb) {
-        let path = `uploads/mcqs/${currentTime.getUTCFullYear()}/`
-        fs.mkdir(path, { recursive: true }, function (err) {
-            if (err) return cb(err);
-            cb(null, path);
-        });
-    },
-    filename: function (req, file, cb) {
-        cb(null, file.originalname);
+// const currentTime = new Date()
+// const store = multer.diskStorage({
+//     destination: function (req, file, cb) {
+//         let path = `uploads/mcqs/${currentTime.getUTCFullYear()}/`
+//         fs.mkdir(path, { recursive: true }, function (err) {
+//             if (err) return cb(err);
+//             cb(null, path);
+//         });
+//     },
+//     filename: function (req, file, cb) {
+//         cb(null, file.originalname);
+//     }
+// });
+// const upload = multer({ storage: store }).single('file');
+
+var storage = new GridFsStorage({
+  url: dbConfig.url + dbConfig.database,
+  options: { useNewUrlParser: true, useUnifiedTopology: true },
+  file: (req, file) => {
+    const match = ["image/png", "image/jpeg"];
+    if (match.indexOf(file.mimetype) === -1) {
+      const filename = file.originalname;
+      return filename;
     }
+    return {
+      bucketName: 'mcqs',
+      filename: file.originalname
+    };
+  }
 });
-const upload = multer({ storage: store }).single('file');
+var upload = multer({ storage: storage }).single("file");
+// var uploadFilesMiddleware = util.promisify(uploadFiles);
+// module.exports = uploadFilesMiddleware;
 
 //Create a new question
 function CreateQuestion(req, res) {
@@ -26,7 +51,9 @@ function CreateQuestion(req, res) {
     console.log(req.file)
     if (req.files) {
         imagesPaths = req.files.map(element => {
-            return currentTime.getUTCFullYear() + "/" + element.originalname;
+            // return currentTime.getUTCFullYear() + "/" + element.originalname;
+            return element.originalname;
+
         });
     }
     else {
@@ -180,6 +207,26 @@ function getImage(req, res) {
     }
 };
 
+const getFilesByName = async (req, res) => {
+    try {
+      await mongoClient.connect();
+      const database = mongoClient.db(dbConfig.database);
+      const bucket = new GridFSBucket(database, {
+        bucketName: 'mcqs',
+      });
+      let readStream = bucket.openDownloadStreamByName(req.params.name);
+      readStream.on("error", function (err) {
+        return res.status(404).send({ message: "Cannot get the Image!" });
+      });
+      return readStream.pipe(res);
+  
+    } catch (error) {
+      return res.status(500).send({
+        message: error.message,
+      });
+    }
+  };
+
 //Routes
 router.get('/', allMcqs_questions);
 router.post('/create/:userId/:topicId/:typeId', [upload], CreateQuestion);
@@ -188,4 +235,6 @@ router.get('/image', getImage)
 router.get('/:id', mcqs_details);
 router.put('/update/:id', mcqs_update);
 router.delete('/delete/:id', mcqs_delete);
+router.get("/files/:name", getFilesByName);
+
 module.exports = router;

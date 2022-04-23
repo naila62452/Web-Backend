@@ -7,6 +7,34 @@ const topicSchema = new mongoose.Schema({
         type: String,
         required: true
     },
+    ageGroup: {
+        type: String,
+        required: true
+    },
+    language: {
+        type: String,
+        required: true
+    },
+    country: {
+        type: String,
+        required: true
+    },
+    grade: {
+        type: String,
+        required: true
+    },
+    type: {
+        type: String,
+        required: true
+    },
+    noOfQuestions: {
+        type: String,
+        required: true
+    },
+    time: {
+        type: Number,
+        required: true
+    },
     // access: {
     //     type: String,
     //     required: true
