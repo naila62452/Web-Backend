@@ -9,6 +9,13 @@ const createTopic = function (req, res) {
     let topic = new Topic(
         {
             topic: req.body.topic,
+            ageGroup: req.body.ageGroup,
+            language: req.body.language,
+            country: req.body.country,
+            grade: req.body.grade,
+            type: req.body.type,
+            noOfQuestions: req.body.noOfQuestions,
+            time: req.body.time,
             subId: req.params.subId,
             userId: req.params.userId,
             ageId: req.params.ageId

@@ -147,15 +147,6 @@ const getFilesByName = async (req, res) => {
     readStream.on("error", function (err) {
       return res.status(404).send({ message: "Cannot get the Image!" });
     });
-    // readStream.on("data", function (data) {
-    //   return res.status(200).write(data);
-    // });
-    // readStream.on("error", function (err) {
-    //   return res.status(404).send({ message: "Cannot get the Image!" });
-    // });
-    // readStream.on("end", () => {
-    //   return res.end();
-    // });
     return readStream.pipe(res);
 
   } catch (error) {
