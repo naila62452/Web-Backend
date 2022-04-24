@@ -39,11 +39,11 @@ const mcqsSchema = new mongoose.Schema({
     required: true,
     ref: "topic"
    },
-   typeId:{
-    type: Schema.Types.ObjectId,
-    required: true,
-    ref: "type"
-   }
+//    typeId:{
+//     type: Schema.Types.ObjectId,
+//     required: true,
+//     ref: "type"
+//    }
 });
 
 const Mcqs = mongoose.model('MCQS', mcqsSchema);

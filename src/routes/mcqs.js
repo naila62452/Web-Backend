@@ -3,7 +3,6 @@ const router = express.Router();
 const Mcqs = require('../models/mcqs');
 const multer = require('multer')
 var fs = require('fs');
-const util = require("util");
 const dbConfig = require("../config/db");
 const url = dbConfig.url;
 const GridFSBucket = require("mongodb").GridFSBucket;
@@ -26,6 +25,7 @@ const { GridFsStorage } = require("multer-gridfs-storage");
 // });
 // const upload = multer({ storage: store }).single('file');
 
+const util = require("util");
 var storage = new GridFsStorage({
   url: dbConfig.url + dbConfig.database,
   options: { useNewUrlParser: true, useUnifiedTopology: true },
@@ -71,7 +71,7 @@ function CreateQuestion(req, res) {
             answer: req.body.answer,
             userId: req.params.userId,
             topicId: req.params.topicId,
-            typeId: req.params.typeId
+            // typeId: req.params.typeId
 
         }
     );
@@ -90,7 +90,7 @@ function CreateQuestion(req, res) {
 
 // Get mcqs by topic
 const getMcqsByTopic = function (req, res) {
-    Mcqs.find({ userId: req.params.userId, topicId: req.params.topicId, typeId: req.params.typeId })
+    Mcqs.find({ userId: req.params.userId, topicId: req.params.topicId})
         .then(data => {
             var message = "";
             if (data === undefined || data.length == 0) message = "No mcqs found!";
@@ -229,8 +229,12 @@ const getFilesByName = async (req, res) => {
 
 //Routes
 router.get('/', allMcqs_questions);
-router.post('/create/:userId/:topicId/:typeId', [upload], CreateQuestion);
-router.get('/getMcqs/:userId/:topicId/:typeId', getMcqsByTopic)
+// router.post('/create/:userId/:topicId/:typeId', [upload], CreateQuestion);
+router.post('/create/:userId/:topicId', [upload], CreateQuestion);
+
+// router.get('/getMcqs/:userId/:topicId/:typeId', getMcqsByTopic)
+router.get('/getMcqs/:userId/:topicId', getMcqsByTopic)
+
 router.get('/image', getImage)
 router.get('/:id', mcqs_details);
 router.put('/update/:id', mcqs_update);
