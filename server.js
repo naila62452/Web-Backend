@@ -18,10 +18,8 @@ const countryRoute = require('./src/routes/country');
 const gradeRoute = require('./src/routes/grade')
 const bodyParser = require('body-parser');
 
-// mongoose.connect('mongodb://localhost/')
+mongoose.connect('mongodb://localhost/')
 // mongoose.connect('mongodb+srv://naila12345:naila12345@cluster0.vw63h.mongodb.net/test')
-
-mongoose.connect(process.env.MONGODB_URL || 'mongodb://localhost/')
     .then(() => console.log('Now connected to MongoDB!'))
     .catch(err => console.error('Something went wrong', err));
 

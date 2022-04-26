@@ -68,6 +68,8 @@ function CreateQuestion(req, res) {
             option3: req.body.option3,
             option4: req.body.option4,
             image: imagesPaths,
+            posFeedback: req.body.posFeedback,
+            negFeedback: req.body.negFeedback,
             answer: req.body.answer,
             userId: req.params.userId,
             topicId: req.params.topicId,
@@ -100,6 +102,7 @@ const getMcqsByTopic = function (req, res) {
             res.status(400).send('Some error occured')
         })
 }
+
 // retrieve and return all mcqs.
 function allMcqs_questions(req, res) {
     Mcqs.find()
