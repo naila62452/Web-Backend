@@ -24,11 +24,12 @@ function CreateTFQuestion(req, res) {
         {
             question: req.body.question,
             answer: req.body.answer,
+            posFeedback: req.body.posFeedback,
+            negFeedback: req.body.negFeedback,
             userId: req.params.userId,
             topicId: req.params.topicId
         }
     );
-
     // save True_false in the database.
     true_false.save()
         .then(data => {

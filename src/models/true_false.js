@@ -12,6 +12,14 @@ const true_falseSchema = new mongoose.Schema({
         type: String,
         required: true
     },
+    posFeedback: {
+        type: String,
+        required: true
+    },
+    negFeedback: {
+        type: String,
+        required: true
+    },
     userId: {
         type: Schema.Types.ObjectId,
         required: true,

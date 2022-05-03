@@ -22,10 +22,10 @@ const mcqsSchema = new mongoose.Schema({
         type: String,
         required: true
     },
-    image: {
-        type: [],
-        require: false
-    },
+    // image: {
+    //     type: [],
+    //     require: false
+    // },
     answer: {
         type: String,
         required: true

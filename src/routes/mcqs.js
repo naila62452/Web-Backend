@@ -25,41 +25,73 @@ const { GridFsStorage } = require("multer-gridfs-storage");
 // });
 // const upload = multer({ storage: store }).single('file');
 
-const util = require("util");
-var storage = new GridFsStorage({
-  url: dbConfig.url + dbConfig.database,
-  options: { useNewUrlParser: true, useUnifiedTopology: true },
-  file: (req, file) => {
-    const match = ["image/png", "image/jpeg"];
-    if (match.indexOf(file.mimetype) === -1) {
-      const filename = file.originalname;
-      return filename;
-    }
-    return {
-      bucketName: 'mcqs',
-      filename: file.originalname
-    };
-  }
-});
-var upload = multer({ storage: storage }).single("file");
-// var uploadFilesMiddleware = util.promisify(uploadFiles);
-// module.exports = uploadFilesMiddleware;
+// const util = require("util");
+// var storage = new GridFsStorage({
+//   url: dbConfig.url + dbConfig.database,
+//   options: { useNewUrlParser: true, useUnifiedTopology: true },
+//   file: (req, file) => {
+//     const match = ["image/png", "image/jpeg"];
+//     if (match.indexOf(file.mimetype) === -1) {
+//       const filename = file.originalname;
+//       return filename;
+//     }
+//     return {
+//       bucketName: 'mcqs',
+//       filename: file.originalname
+//     };
+//   }
+// });
+// var upload = multer({ storage: storage }).single("file");
+// // var uploadFilesMiddleware = util.promisify(uploadFiles);
+// // module.exports = uploadFilesMiddleware;
+
+// //Create a new question
+// function CreateQuestion(req, res) {
+//     let imagesPaths = [];
+//     console.log(req.file)
+//     if (req.files) {
+//         imagesPaths = req.files.map(element => {
+//             // return currentTime.getUTCFullYear() + "/" + element.originalname;
+//             return element.originalname;
+
+//         });
+//     }
+//     else {
+        
+//         imagesPaths.push(req.file.originalname)
+//     }
+//     let mcqs = new Mcqs(
+//         {
+//             mcqs: req.body.mcqs,
+//             option1: req.body.option1,
+//             option2: req.body.option2,
+//             option3: req.body.option3,
+//             option4: req.body.option4,
+//             image: imagesPaths,
+//             posFeedback: req.body.posFeedback,
+//             negFeedback: req.body.negFeedback,
+//             answer: req.body.answer,
+//             userId: req.params.userId,
+//             topicId: req.params.topicId,
+//             // typeId: req.params.typeId
+
+//         }
+//     );
+
+//     // save mcqs in the database.
+//     mcqs.save()
+//         .then(data => {
+//             res.send(data);
+//         }).catch(err => {
+//             res.status(500).send({
+//                 success: false,
+//                 message: err.message || "Some error occurred while creating the mcqs."
+//             });
+//         });
+// };
 
 //Create a new question
 function CreateQuestion(req, res) {
-    let imagesPaths = [];
-    console.log(req.file)
-    if (req.files) {
-        imagesPaths = req.files.map(element => {
-            // return currentTime.getUTCFullYear() + "/" + element.originalname;
-            return element.originalname;
-
-        });
-    }
-    else {
-        
-        imagesPaths.push(req.file.originalname)
-    }
     let mcqs = new Mcqs(
         {
             mcqs: req.body.mcqs,
@@ -67,14 +99,11 @@ function CreateQuestion(req, res) {
             option2: req.body.option2,
             option3: req.body.option3,
             option4: req.body.option4,
-            image: imagesPaths,
             posFeedback: req.body.posFeedback,
             negFeedback: req.body.negFeedback,
             answer: req.body.answer,
             userId: req.params.userId,
-            topicId: req.params.topicId,
-            // typeId: req.params.typeId
-
+            topicId: req.params.topicId
         }
     );
 
@@ -89,7 +118,6 @@ function CreateQuestion(req, res) {
             });
         });
 };
-
 // Get mcqs by topic
 const getMcqsByTopic = function (req, res) {
     Mcqs.find({ userId: req.params.userId, topicId: req.params.topicId})
@@ -233,7 +261,8 @@ const getFilesByName = async (req, res) => {
 //Routes
 router.get('/', allMcqs_questions);
 // router.post('/create/:userId/:topicId/:typeId', [upload], CreateQuestion);
-router.post('/create/:userId/:topicId', [upload], CreateQuestion);
+// router.post('/create/:userId/:topicId', [upload], CreateQuestion);
+router.post('/createQuestion/:userId/:topicId', CreateQuestion);
 
 // router.get('/getMcqs/:userId/:topicId/:typeId', getMcqsByTopic)
 router.get('/getMcqs/:userId/:topicId', getMcqsByTopic)

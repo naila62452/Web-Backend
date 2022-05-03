@@ -13,7 +13,6 @@ const createTopic = function (req, res) {
             language: req.body.language,
             country: req.body.country,
             grade: req.body.grade,
-            type: req.body.type,
             noOfQuestions: req.body.noOfQuestions,
             time: req.body.time,
             subId: req.params.subId,
@@ -135,7 +134,6 @@ subjectController.searchSubject = async (req, res) => {
         return res.status(404).json({ error: err.error });
     }
 };
-
 
 // Routes
 router.post('/create/:userId/:subId/:ageId', createTopic);
