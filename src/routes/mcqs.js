@@ -3,34 +3,95 @@ const router = express.Router();
 const Mcqs = require('../models/mcqs');
 const multer = require('multer')
 var fs = require('fs');
-const url = require('url');
+const dbConfig = require("../config/db");
+const url = dbConfig.url;
+const GridFSBucket = require("mongodb").GridFSBucket;
+const MongoClient = require("mongodb").MongoClient;
+const mongoClient = new MongoClient(url);
+const { GridFsStorage } = require("multer-gridfs-storage");
 
-const currentTime = new Date()
-const store = multer.diskStorage({
-    destination: function (req, file, cb) {
-        let path = `uploads/mcqs/${currentTime.getUTCFullYear()}/`
-        fs.mkdir(path, { recursive: true }, function (err) {
-            if (err) return cb(err);
-            cb(null, path);
-        });
-    },
-    filename: function (req, file, cb) {
-        cb(null, file.originalname);
-    }
-});
-const upload = multer({ storage: store }).single('file');
+// const currentTime = new Date()
+// const store = multer.diskStorage({
+//     destination: function (req, file, cb) {
+//         let path = `uploads/mcqs/${currentTime.getUTCFullYear()}/`
+//         fs.mkdir(path, { recursive: true }, function (err) {
+//             if (err) return cb(err);
+//             cb(null, path);
+//         });
+//     },
+//     filename: function (req, file, cb) {
+//         cb(null, file.originalname);
+//     }
+// });
+// const upload = multer({ storage: store }).single('file');
+
+// const util = require("util");
+// var storage = new GridFsStorage({
+//   url: dbConfig.url + dbConfig.database,
+//   options: { useNewUrlParser: true, useUnifiedTopology: true },
+//   file: (req, file) => {
+//     const match = ["image/png", "image/jpeg"];
+//     if (match.indexOf(file.mimetype) === -1) {
+//       const filename = file.originalname;
+//       return filename;
+//     }
+//     return {
+//       bucketName: 'mcqs',
+//       filename: file.originalname
+//     };
+//   }
+// });
+// var upload = multer({ storage: storage }).single("file");
+// // var uploadFilesMiddleware = util.promisify(uploadFiles);
+// // module.exports = uploadFilesMiddleware;
+
+// //Create a new question
+// function CreateQuestion(req, res) {
+//     let imagesPaths = [];
+//     console.log(req.file)
+//     if (req.files) {
+//         imagesPaths = req.files.map(element => {
+//             // return currentTime.getUTCFullYear() + "/" + element.originalname;
+//             return element.originalname;
+
+//         });
+//     }
+//     else {
+        
+//         imagesPaths.push(req.file.originalname)
+//     }
+//     let mcqs = new Mcqs(
+//         {
+//             mcqs: req.body.mcqs,
+//             option1: req.body.option1,
+//             option2: req.body.option2,
+//             option3: req.body.option3,
+//             option4: req.body.option4,
+//             image: imagesPaths,
+//             posFeedback: req.body.posFeedback,
+//             negFeedback: req.body.negFeedback,
+//             answer: req.body.answer,
+//             userId: req.params.userId,
+//             topicId: req.params.topicId,
+//             // typeId: req.params.typeId
+
+//         }
+//     );
+
+//     // save mcqs in the database.
+//     mcqs.save()
+//         .then(data => {
+//             res.send(data);
+//         }).catch(err => {
+//             res.status(500).send({
+//                 success: false,
+//                 message: err.message || "Some error occurred while creating the mcqs."
+//             });
+//         });
+// };
 
 //Create a new question
 function CreateQuestion(req, res) {
-    let imagesPaths = [];
-    if (req.files) {
-        imagesPaths = req.files.map(element => {
-            return currentTime.getUTCFullYear() + "/" + element.originalname;
-        });
-    }
-    else {
-        imagesPaths.push(req.file.originalname)
-    }
     let mcqs = new Mcqs(
         {
             mcqs: req.body.mcqs,
@@ -38,12 +99,11 @@ function CreateQuestion(req, res) {
             option2: req.body.option2,
             option3: req.body.option3,
             option4: req.body.option4,
-            image: imagesPaths,
+            posFeedback: req.body.posFeedback,
+            negFeedback: req.body.negFeedback,
             answer: req.body.answer,
             userId: req.params.userId,
-            topicId: req.params.topicId,
-            typeId: req.params.typeId
-
+            topicId: req.params.topicId
         }
     );
 
@@ -58,10 +118,9 @@ function CreateQuestion(req, res) {
             });
         });
 };
-
 // Get mcqs by topic
 const getMcqsByTopic = function (req, res) {
-    Mcqs.find({ userId: req.params.userId, topicId: req.params.topicId, typeId: req.params.typeId })
+    Mcqs.find({ userId: req.params.userId, topicId: req.params.topicId})
         .then(data => {
             var message = "";
             if (data === undefined || data.length == 0) message = "No mcqs found!";
@@ -71,6 +130,7 @@ const getMcqsByTopic = function (req, res) {
             res.status(400).send('Some error occured')
         })
 }
+
 // retrieve and return all mcqs.
 function allMcqs_questions(req, res) {
     Mcqs.find()
@@ -178,12 +238,39 @@ function getImage(req, res) {
     }
 };
 
+const getFilesByName = async (req, res) => {
+    try {
+      await mongoClient.connect();
+      const database = mongoClient.db(dbConfig.database);
+      const bucket = new GridFSBucket(database, {
+        bucketName: 'mcqs',
+      });
+      let readStream = bucket.openDownloadStreamByName(req.params.name);
+      readStream.on("error", function (err) {
+        return res.status(404).send({ message: "Cannot get the Image!" });
+      });
+      return readStream.pipe(res);
+  
+    } catch (error) {
+      return res.status(500).send({
+        message: error.message,
+      });
+    }
+  };
+
 //Routes
 router.get('/', allMcqs_questions);
-router.post('/create/:userId/:topicId/:typeId', [upload], CreateQuestion);
-router.get('/getMcqs/:userId/:topicId/:typeId', getMcqsByTopic)
+// router.post('/create/:userId/:topicId/:typeId', [upload], CreateQuestion);
+// router.post('/create/:userId/:topicId', [upload], CreateQuestion);
+router.post('/createQuestion/:userId/:topicId', CreateQuestion);
+
+// router.get('/getMcqs/:userId/:topicId/:typeId', getMcqsByTopic)
+router.get('/getMcqs/:userId/:topicId', getMcqsByTopic)
+
 router.get('/image', getImage)
 router.get('/:id', mcqs_details);
 router.put('/update/:id', mcqs_update);
 router.delete('/delete/:id', mcqs_delete);
+router.get("/files/:name", getFilesByName);
+
 module.exports = router;
