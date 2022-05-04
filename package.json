@@ -6,7 +6,9 @@
   "scripts": {
     "start": "nodemon server.js"
   },
-
+  "engines": {
+    "node": "12.20.1"
+  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/naila62452/Web-Backend.git"
@@ -27,7 +29,7 @@
     "crypto": "^1.0.1",
     "crypto-js": "^4.1.1",
     "ejs": "^3.1.6",
-    "express": "^4.17.2",
+    "express": "^4.17.3",
     "express-handlebars": "^6.0.3",
     "find-cache-dir": "^3.3.2",
     "joi": "^17.6.0",

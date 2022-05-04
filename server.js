@@ -14,11 +14,12 @@ const imageRoute = require('./src/routes/image');
 const questionTypeRoute = require('./src/routes/question_category');
 const ageGroupRoute = require('./src/routes/ageGroup');
 const languageRoute = require('./src/routes/language');
-const countryRoute = require('./src/routes/country');
-const gradeRoute = require('./src/routes/grade')
-const bodyParser = require('body-parser');
+const activityRoute = require('./src/routes/activity');
+const bodyParser= require('body-parser');
 
-mongoose.connect('mongodb://localhost/')
+//mongoose.connect('mongodb://localhost/')
+mongoose.connect('mongodb+srv://alizain:alpha786@cluster0.vw63h.mongodb.net/test')
+
     .then(() => console.log('Now connected to MongoDB!'))
     .catch(err => console.error('Something went wrong', err));
 
@@ -47,9 +48,7 @@ app.use('/api/image', imageRoute);
 app.use('/api/type', questionTypeRoute);
 app.use('/api/age', ageGroupRoute);
 app.use('/api/language', languageRoute);
-app.use('/api/country', countryRoute);
-app.use('/api/grade', gradeRoute)
-
+app.use('/api/activity', activityRoute);
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => console.log(`Listening on port ${PORT}...`));
 

@@ -1,22 +1,13 @@
-const { required } = require('joi');
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
-const true_falseSchema = new mongoose.Schema({
+const open_endedSchema = new mongoose.Schema({
 
     question: {
         type: String,
         required: true
     },
-    answer: {
-        type: String,
-        required: true
-    },
-    posFeedback: {
-        type: String,
-        required: true
-    },
-    negFeedback: {
+    feedback: {
         type: String,
         required: true
     },
@@ -32,5 +23,5 @@ const true_falseSchema = new mongoose.Schema({
     }
 })
 
-const True_false = mongoose.model('true_false', true_falseSchema);
-module.exports = True_false;
+const Open_Ended = mongoose.model('Open_ended', open_endedSchema);
+module.exports = Open_Ended;
