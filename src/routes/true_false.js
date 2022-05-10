@@ -16,7 +16,7 @@ function CreateTFQuestion(req, res) {
     if (!isValidQuestionRequest(req)) {
         return res.status(400).send({
             success: false,
-            message: "Please fill out all the required feilds"
+            message: "Please fill out all the required fields"
         });
     }
     // create a true false
